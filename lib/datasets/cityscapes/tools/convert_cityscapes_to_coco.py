@@ -158,7 +158,7 @@ def convert_cityscapes_instance_only(
                                 continue  # skip non-instance categories
 
                             len_p = [len(p) for p in obj['contours']]
-                            if min(len_p) <= 4:
+                            if min(len_p) <= 1:
                                 print('Warning: invalid contours.')
                                 continue  # skip non-instance categories
 
@@ -188,7 +188,7 @@ def convert_cityscapes_instance_only(
         print("Num categories: %s" % len(categories))
         print("Num images: %s" % len(images))
         print("Num annotations: %s" % len(annotations))
-        with open(os.path.join(out_dir, json_name % data_set), 'wb') as outfile:
+        with open(os.path.join(out_dir, json_name % data_set), 'w') as outfile:
             outfile.write(json.dumps(ann_dict))
 
 
