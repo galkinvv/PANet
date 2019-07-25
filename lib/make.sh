@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 
 CUDA_PATH=/usr/local/cuda/
+PATH=$PATH:/Developer/NVIDIA/CUDA-10.1/bin
+
+scriptpath=$(cd "$(dirname "$1")"; pwd)
+if [ -z $PYTHONPATH ]
+then
+    export PYTHONPATH=$scriptpath
+else
+    export PYTHONPATH=$PYTHONPATH:$scriptpath
+fi
+echo PYTHONPATH=$PYTHONPATH
 
 python3 setup.py build_ext --inplace
 rm -rf build

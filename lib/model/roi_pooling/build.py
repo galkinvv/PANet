@@ -1,7 +1,7 @@
 from __future__ import print_function
 import os
 import torch
-from torch.utils.ffi import create_extension
+from pytorch040_ffi import create_extension
 
 
 sources = ['src/roi_pooling.c']

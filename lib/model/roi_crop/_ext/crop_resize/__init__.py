@@ -1,5 +1,5 @@
 
-from torch.utils.ffi import _wrap_function
+from pytorch040_ffi import _wrap_function
 from ._crop_resize import lib as _lib, ffi as _ffi
 
 __all__ = []
