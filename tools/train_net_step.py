@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """ Training script for steps_with_decay policy"""
 
 import argparse
@@ -149,6 +150,8 @@ def main():
         cfg.CUDA = True
     else:
         raise ValueError("Need Cuda device to run !")
+
+    logger.info("Cuda device count: %i", torch.cuda.device_count())
 
     if args.dataset == "coco2017":
         cfg.TRAIN.DATASETS = ('coco_2017_train',)

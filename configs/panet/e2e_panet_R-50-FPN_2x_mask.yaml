@@ -3,7 +3,7 @@ MODEL:
   CONV_BODY: FPN.fpn_ResNet50_conv5_body_bup
   FASTER_RCNN: True
   MASK_ON: True
-NUM_GPUS: 4
+NUM_GPUS: 1
 SOLVER:
   WEIGHT_DECAY: 0.0001
   LR_POLICY: steps_with_decay
