@@ -12,7 +12,7 @@ with_cuda = False
 
 if torch.cuda.is_available():
     print('Including CUDA code.')
-    sources += ['src/nms_cuda.c']
+    sources += ['src/nms_cuda.cpp']
     headers += ['src/nms_cuda.h']
     defines += [('WITH_CUDA', None)]
     with_cuda = True

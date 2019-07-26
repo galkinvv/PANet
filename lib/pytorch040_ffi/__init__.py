@@ -70,7 +70,7 @@ _import_symbols(locals())
 def _setup_wrapper(with_cuda):
     import torch
     torch_dir = os.path.abspath(os.path.dirname(inspect.getfile(torch)))
-    lib_dir = torch_dir
+    lib_dir = os.path.join(torch_dir, 'lib')
     include_dirs = [
         os.path.join(lib_dir, 'include'),
         os.path.join(lib_dir, 'include', 'TH'),
@@ -186,7 +186,7 @@ def create_extension(name, headers, sources, verbose=True, with_cuda=False,
                    sources=sources,
                    include_dirs=include_dirs,
                    library_dirs=library_dirs,
-                   extra_compile_args=["-std=c++11", "-stdlib=libc++"],
+                   extra_compile_args=["-std=c++11"],
                    source_extension='.cpp',
                    **kwargs)
     ffi.cdef(_typedefs + all_headers_source)
