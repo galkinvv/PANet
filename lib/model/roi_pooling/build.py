@@ -1,17 +1,17 @@
 from __future__ import print_function
 import os
 import torch
-from torch.utils.ffi import create_extension
+from pytorch040_ffi import create_extension
 
 
-sources = ['src/roi_pooling.c']
+sources = ['src/roi_pooling.cpp']
 headers = ['src/roi_pooling.h']
 defines = []
 with_cuda = False
 
 if torch.cuda.is_available():
     print('Including CUDA code.')
-    sources += ['src/roi_pooling_cuda.c']
+    sources += ['src/roi_pooling_cuda.cpp']
     headers += ['src/roi_pooling_cuda.h']
     defines += [('WITH_CUDA', None)]
     with_cuda = True

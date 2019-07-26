@@ -1,18 +1,18 @@
 from __future__ import print_function
 import os
 import torch
-from torch.utils.ffi import create_extension
+from pytorch040_ffi import create_extension
 
 #this_file = os.path.dirname(__file__)
 
-sources = ['src/roi_crop.c']
+sources = ['src/roi_crop.cpp']
 headers = ['src/roi_crop.h']
 defines = []
 with_cuda = False
 
 if torch.cuda.is_available():
     print('Including CUDA code.')
-    sources += ['src/roi_crop_cuda.c']
+    sources += ['src/roi_crop_cuda.cpp']
     headers += ['src/roi_crop_cuda.h']
     defines += [('WITH_CUDA', None)]
     with_cuda = True

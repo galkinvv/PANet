@@ -5,7 +5,6 @@ import torch
 from torch.autograd import Variable
 from ._functions import Scatter, Gather
 from torch._six import string_classes, int_classes
-from torch.utils.data.dataloader import numpy_type_map
 
 
 def scatter(inputs, target_gpus, dim=0):
@@ -79,6 +78,16 @@ def gather(outputs, target_device, dim=0):
 
                 return Variable(torch.from_numpy(np.concatenate(outputs, dim)))
             if elem.shape == ():  # scalars
+                numpy_type_map = {
+                    'float64': torch.DoubleTensor,
+                    'float32': torch.FloatTensor,
+                    'float16': torch.HalfTensor,
+                    'int64': torch.LongTensor,
+                    'int32': torch.IntTensor,
+                    'int16': torch.ShortTensor,
+                    'int8': torch.CharTensor,
+                    'uint8': torch.ByteTensor,
+                }
                 py_type = float if elem.dtype.name.startswith('float') else int
                 return Variable(numpy_type_map[elem.dtype.name](list(map(py_type, outputs))))
         elif isinstance(out, int_classes):

@@ -76,10 +76,10 @@ class SmoothedValue(object):
         self.count = 0
 
     def AddValue(self, value):
-        self.deque.append(value)
-        self.series.append(value)
+        self.deque.append(value.cpu().numpy())
+        self.series.append(value.cpu().numpy())
         self.count += 1
-        self.total += value
+        self.total += value.cpu().numpy()
 
     def GetMedianValue(self):
         return np.median(self.deque)
