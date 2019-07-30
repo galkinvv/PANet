@@ -26,6 +26,7 @@ import logging
 import numpy as np
 import smtplib
 import sys
+import torch
 
 from core.config import cfg
 
@@ -75,6 +76,8 @@ class SmoothedValue(object):
         self.count = 0
 
     def AddValue(self, value):
+        if isinstance(value, torch.Tensor):
+            value = value.cpu().numpy()
         self.deque.append(value)
         self.series.append(value)
         self.count += 1
