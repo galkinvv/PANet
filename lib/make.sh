@@ -15,4 +15,4 @@ CUDA_ARCH="-gencode arch=compute_30,code=sm_30 \
 #          -gencode arch=compute_70,code=sm_70 "
 
 python3 setup_layers.py build
-mv build/lib.linux-x86_64-3.5/model/_C.cpython-35m-x86_64-linux-gnu.so model
+mv -v build/lib.*/model/_C.*.so model
