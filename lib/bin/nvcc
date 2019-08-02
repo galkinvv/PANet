@@ -2,7 +2,7 @@
 import os, sys, subprocess
 hipcc = os.getenv("HIP_DIR", "/opt/rocm/hip")+"/bin/hipcc"
 args = sys.argv[1:]
-args = list(filter(lambda x: x !='--compiler-options', args))
-cmdline = [hipcc] + args
+args = list(filter(lambda x: x !='--compiler-options' and x !='--expt-relaxed-constexpr', args))
+cmdline = [hipcc] + ['-g'] + args
 #print(cmdline)
 sys.exit(subprocess.run(cmdline).returncode)
