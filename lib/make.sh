@@ -3,7 +3,7 @@ SELF=`readlink -f "$0"`
 SELF_DIR=`dirname "$SELF"`
 cd "$SELF_DIR"
 
-#python3 setup_bbox.py build_ext --inplace
+python3 setup_bbox.py build_ext --inplace
 rm -rf build
 HIP_DIR=/opt/rocm/hip
 if [ -d "$HIP_DIR" ]; then
