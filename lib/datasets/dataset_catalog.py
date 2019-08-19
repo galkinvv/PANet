@@ -36,8 +36,27 @@ IM_PREFIX = 'image_prefix'
 DEVKIT_DIR = 'devkit_directory'
 RAW_DIR = 'raw_dir'
 
+class DatasetsDict:
+    '''
+    Lazy initialization for DATASETS to make use cfg.DATA_DIR assigned as parameter
+    '''
+    def __init__(self):
+        self._datasets = None
+    def _get_datasets(self):
+        if self._datasets is None:
+            self._datasets = get_datasets_dict()
+        return self._datasets
+    def __getitem__(self, item):
+        return self._get_datasets()[item]
+    def keys(self):
+        return self._get_datasets().keys()
+
+DATASETS = DatasetsDict()
+
 # Available datasets
-DATASETS = {
+def get_datasets_dict():
+    _DATA_DIR = cfg.DATA_DIR
+    return {
     'cityscapes_fine_instanceonly_seg_train': {
         IM_DIR:
             _DATA_DIR + '/cityscapes/images',
