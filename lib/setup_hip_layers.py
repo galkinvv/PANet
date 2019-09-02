@@ -3,6 +3,7 @@
 
 import glob
 import os
+import types
 
 import torch
 from setuptools import find_packages
@@ -11,6 +12,17 @@ from setuptools import setup
 from torch.utils.cpp_extension import CppExtension
 
 requirements = ["torch", "torchvision"]
+
+class LinkHipExtension(torch.utils.cpp_extension.BuildExtension):
+    def build_extension(self, *args, **kwargs):
+        HIP_DIR = os.environ['HIP_DIR']
+        if HIP_DIR:
+            orig_link = self.compiler.link
+            def new_link(self_to_patch, *args, **kwargs):
+                self_to_patch.linker_so[0] = HIP_DIR + "/bin/hipcc"
+                orig_link(*args[:-1]) #skip target_lang so custom linker won't be replaced with c++
+            self.compiler.link = types.MethodType(new_link, self.compiler)
+        super(LinkHipExtension, self).build_extension(*args, **kwargs)
 
 
 def get_extensions():
@@ -68,5 +80,5 @@ setup(
     packages=find_packages(exclude=("configs", "tests",)),
     # install_requires=requirements,
     ext_modules=get_extensions(),
-    cmdclass={"build_ext": torch.utils.cpp_extension.BuildExtension},
+    cmdclass={"build_ext": LinkHipExtension},
 )
