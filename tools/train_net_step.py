@@ -350,6 +350,18 @@ def main():
         blob = {'cfg': yaml.dump(cfg), 'args': args}
         with open(os.path.join(output_dir, 'config_and_args.pkl'), 'wb') as f:
             pickle.dump(blob, f, pickle.HIGHEST_PROTOCOL)
+        with open(os.path.join(output_dir, 'config_and_args.cfg'), 'w') as f:
+            def write_item(f, item, margin=0):
+                if isinstance(item, dict):
+                    f.write('{\n')
+                    for k,v in item.items():
+                        f.write(margin*' ' + "'{0}': ".format(k))
+                        write_item(f, v, margin=margin+4)
+                    f.write(margin*' ' + '}\n')
+                else:
+                    f.write(str(item) + ',\n')
+            write_item(f, {'cfg': cfg, 'args': args})
+
 
         if args.use_tfboard:
             from tensorboardX import SummaryWriter
