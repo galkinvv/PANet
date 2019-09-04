@@ -1,3 +1,4 @@
+#!/bin/bash
 SELF=`readlink -f "$0"`
 SELF_DIR=`dirname "$SELF"`
 cd "$SELF_DIR"
