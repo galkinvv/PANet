@@ -92,5 +92,5 @@ def evaluate_masks(
                     # save mask
                     cv2.imwrite(os.path.join(output_dir, pngname), mask * 255)
     logger.info('Evaluating...')
-    cityscapes_eval.main([])
+    cityscapes_eval.main()
     return None
