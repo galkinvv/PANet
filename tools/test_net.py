@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Perform inference on one or more datasets."""
 
 import argparse
@@ -68,6 +69,8 @@ if __name__ == '__main__':
     logger.info('Called with args:')
     logger.info(args)
 
+    logger.info("Cuda device count: %i", torch.cuda.device_count())
+
     assert (torch.cuda.device_count() == 1) ^ bool(args.multi_gpu_testing)
 
     assert bool(args.load_ckpt) ^ bool(args.load_detectron), \
@@ -81,6 +84,8 @@ if __name__ == '__main__':
         os.makedirs(args.output_dir)
 
     cfg.VIS = args.vis
+
+    cfg.CLUSTER= utils.collections.AttrDict({'ON_CLUSTER':False})
 
     if args.cfg_file is not None:
         merge_cfg_from_file(args.cfg_file)
