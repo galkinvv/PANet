@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """ Training script for steps_with_decay policy"""
 
 import argparse
@@ -106,6 +107,10 @@ def parse_args():
     parser.add_argument(
         '--load_ckpt', help='checkpoint path to load')
     parser.add_argument(
+        '--skip_top_layers',
+        help='don\'t load last layers from checkpoint (for pretraining on datasets with different categories)',
+        action='store_true')
+    parser.add_argument(
         '--load_detectron', help='path to the detectron weight pickle file')
 
     parser.add_argument(
@@ -149,6 +154,8 @@ def main():
         cfg.CUDA = True
     else:
         raise ValueError("Need Cuda device to run !")
+
+    logger.info("Cuda device count: %i", torch.cuda.device_count())
 
     if args.dataset == "coco2017":
         cfg.TRAIN.DATASETS = ('coco_2017_train',)
@@ -314,7 +321,7 @@ def main():
         load_name = args.load_ckpt
         logging.info("loading checkpoint %s", load_name)
         checkpoint = torch.load(load_name, map_location=lambda storage, loc: storage)
-        net_utils.load_ckpt(maskRCNN, checkpoint['model'])
+        net_utils.load_ckpt(maskRCNN, checkpoint['model'], args.skip_top_layers)
         if args.resume:
             args.start_step = checkpoint['step'] + 1
             if 'train_size' in checkpoint:  # For backward compatibility

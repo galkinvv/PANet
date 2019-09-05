@@ -153,13 +153,14 @@ def save_ckpt(output_dir, args, model, optimizer):
     logger.info('save model: %s', save_name)
 
 
-def load_ckpt(model, ckpt):
+def load_ckpt(model, ckpt, skip_top_layers=False):
     """Load checkpoint"""
     mapping, _ = model.detectron_weight_mapping
     state_dict = {}
     for name in ckpt:
         #if mapping[name]:
-        state_dict[name] = ckpt[name]
+        if not (skip_top_layers and (name.startswith('Box_Outs.') or name.startswith('Mask_Outs'))):
+            state_dict[name] = ckpt[name]
     model.load_state_dict(state_dict, strict=False)
 
 
