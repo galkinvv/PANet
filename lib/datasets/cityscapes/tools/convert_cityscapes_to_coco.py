@@ -92,9 +92,9 @@ def convert_cityscapes_instance_only(
         # 'gtCoarse_train_extra'
     ]
     ann_dirs = [
-        'gtFine_trainvaltest/gtFine/val',
+        'raw/gtFine_trainvaltest/gtFine/val',
         # 'gtFine_trainvaltest/gtFine/train',
-        # 'gtFine_trainvaltest/gtFine/test',
+        #'raw/gtFine_trainvaltest/gtFine/test',
 
         # 'gtCoarse/train',
         # 'gtCoarse/train_extra',
@@ -104,8 +104,17 @@ def convert_cityscapes_instance_only(
     ends_in = '%s_polygons.json'
     img_id = 0
     ann_id = 0
-    cat_id = 1
-    category_dict = {}
+    cat_id = 9
+    category_dict = {
+        'train': 1,
+        'truck': 2,
+        'rider': 3,
+        'person': 4,
+        'bus': 5,
+        'motorcycle': 6,
+        'bicycle': 7,
+        'car': 8,
+    }
 
     category_instancesonly = [
         'person',
@@ -117,7 +126,7 @@ def convert_cityscapes_instance_only(
         'motorcycle',
         'bicycle',
     ]
-
+    # /home/orwell/Programming/AMD/data/cityscapes/raw/gtFine_trainvaltest/gtFine/test/
     for data_set, ann_dir in zip(sets, ann_dirs):
         print('Starting %s' % data_set)
         ann_dict = {}
@@ -158,7 +167,7 @@ def convert_cityscapes_instance_only(
                                 continue  # skip non-instance categories
 
                             len_p = [len(p) for p in obj['contours']]
-                            if min(len_p) <= 4:
+                            if min(len_p) <= 1:
                                 print('Warning: invalid contours.')
                                 continue  # skip non-instance categories
 
@@ -188,7 +197,7 @@ def convert_cityscapes_instance_only(
         print("Num categories: %s" % len(categories))
         print("Num images: %s" % len(images))
         print("Num annotations: %s" % len(annotations))
-        with open(os.path.join(out_dir, json_name % data_set), 'wb') as outfile:
+        with open(os.path.join(out_dir, json_name % data_set), 'w') as outfile:
             outfile.write(json.dumps(ann_dict))
 
 
