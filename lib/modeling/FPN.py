@@ -345,8 +345,8 @@ class topdown_lateral_module(nn.Module):
         # Lateral 1x1 conv
         lat = self.conv_lateral(lateral_blob)
         # Top-down 2x upsampling
-        # td = F.upsample(top_blob, size=lat.size()[2:], mode='bilinear')
-        td = F.upsample(top_blob, scale_factor=2, mode='nearest')
+        # td = F.interpolate(top_blob, size=lat.size()[2:], mode='bilinear')
+        td = F.interpolate(top_blob, scale_factor=2, mode='nearest')
         # Sum lateral and top-down
         return lat + td
 
@@ -454,7 +454,7 @@ class fpn_rpn_outputs(nn.Module):
                         fpn_rpn_cls_score.view(B, 2, C // 2, H, W), dim=1)
                     fpn_rpn_cls_probs = fpn_rpn_cls_probs[:, 1].squeeze(dim=1)
                 else:  # sigmoid
-                    fpn_rpn_cls_probs = F.sigmoid(fpn_rpn_cls_score)
+                    fpn_rpn_cls_probs = torch.sigmoid(fpn_rpn_cls_score)
 
                 fpn_rpn_rois, fpn_rpn_roi_probs = self.GenerateProposals_modules[lvl - k_min](
                     fpn_rpn_cls_probs, fpn_rpn_bbox_pred, im_info)
@@ -498,7 +498,7 @@ def fpn_rpn_losses(**kwargs):
             weight = (rpn_labels_int32_fpn >= 0).float()
             loss_rpn_cls_fpn = F.binary_cross_entropy_with_logits(
                 kwargs['rpn_cls_logits_fpn' + slvl], rpn_labels_int32_fpn.float(), weight,
-                size_average=False)
+                reduction='sum')
             loss_rpn_cls_fpn /= cfg.TRAIN.RPN_BATCH_SIZE_PER_IM * cfg.TRAIN.IMS_PER_BATCH
 
         # Normalization by (1) RPN_BATCH_SIZE_PER_IM and (2) IMS_PER_BATCH is
