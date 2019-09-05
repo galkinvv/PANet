@@ -75,7 +75,7 @@ def parse_args():
         type=int)
     parser.add_argument(
         '--iter_size',
-        help='Update once every iter_size steps, as in Caffe.',
+        help='Split batch in iter_size steps and accumulate gradients (to allow runing same config with lower gpu memory).',
         default=1, type=int)
 
     parser.add_argument(
@@ -178,13 +178,15 @@ def main():
     original_ims_per_batch = cfg.TRAIN.IMS_PER_BATCH
     original_num_gpus = cfg.NUM_GPUS
     if args.batch_size is None:
-        args.batch_size = original_batch_size
+        assert (original_batch_size % args.iter_size) == 0, \
+            'original_batch_size: %d, args.iter_size: %d' % (original_batch_size, args.iter_size)
+        args.batch_size = original_batch_size // args.iter_size
     cfg.NUM_GPUS = torch.cuda.device_count()
     assert (args.batch_size % cfg.NUM_GPUS) == 0, \
         'batch_size: %d, NUM_GPUS: %d' % (args.batch_size, cfg.NUM_GPUS)
     cfg.TRAIN.IMS_PER_BATCH = args.batch_size // cfg.NUM_GPUS
     effective_batch_size = args.iter_size * args.batch_size
-    print('effective_batch_size = batch_size * iter_size = %d * %d' % (args.batch_size, args.iter_size))
+    print('effective_batch_size = per_iter_batch_size * iter_size = %d * %d' % (args.batch_size, args.iter_size))
 
     print('Adaptive config changes:')
     print('    effective_batch_size: %d --> %d' % (original_batch_size, effective_batch_size))
@@ -196,19 +198,9 @@ def main():
     # on batch_size instead of effective_batch_size
     old_base_lr = cfg.SOLVER.BASE_LR
     cfg.SOLVER.BASE_LR *= args.batch_size / original_batch_size
-    print('Adjust BASE_LR linearly according to batch_size change:\n'
+    if old_base_lr != cfg.SOLVER.BASE_LR:
+        print('Adjust BASE_LR linearly according to batch_size change:\n'
           '    BASE_LR: {} --> {}'.format(old_base_lr, cfg.SOLVER.BASE_LR))
-
-    ### Adjust solver steps
-    step_scale = original_batch_size / effective_batch_size
-    old_solver_steps = cfg.SOLVER.STEPS
-    old_max_iter = cfg.SOLVER.MAX_ITER
-    cfg.SOLVER.STEPS = list(map(lambda x: int(x * step_scale + 0.5), cfg.SOLVER.STEPS))
-    cfg.SOLVER.MAX_ITER = int(cfg.SOLVER.MAX_ITER * step_scale + 0.5)
-    print('Adjust SOLVER.STEPS and SOLVER.MAX_ITER linearly based on effective_batch_size change:\n'
-          '    SOLVER.STEPS: {} --> {}\n'
-          '    SOLVER.MAX_ITER: {} --> {}'.format(old_solver_steps, cfg.SOLVER.STEPS,
-                                                  old_max_iter, cfg.SOLVER.MAX_ITER))
 
     # Scale FPN rpn_proposals collect size (post_nms_topN) in `collect` function
     # of `collect_and_distribute_fpn_rpn_proposals.py`
@@ -381,7 +373,7 @@ def main():
     ### Training Loop ###
     maskRCNN.train()
 
-    CHECKPOINT_PERIOD = int(cfg.TRAIN.SNAPSHOT_ITERS / cfg.NUM_GPUS)
+    CHECKPOINT_PERIOD = int(cfg.TRAIN.SNAPSHOT_ITERS / original_num_gpus)
 
     # Set index for decay steps
     decay_steps_ind = None
@@ -397,7 +389,7 @@ def main():
         args.disp_interval,
         tblogger if args.use_tfboard and not args.no_save else None)
     try:
-        logger.info('Training starts !')
+        logger.info('Training starts, chekpointning every {0} iters !'.format(CHECKPOINT_PERIOD))
         step = args.start_step
         for step in range(args.start_step, cfg.SOLVER.MAX_ITER):
 
