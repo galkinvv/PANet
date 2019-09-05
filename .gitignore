@@ -8,6 +8,7 @@ data/*
 .ipynb_checkpoints
 notebooks/*.pkl
 
+/lib/build
 /Outputs
 
 # ------------------------------
