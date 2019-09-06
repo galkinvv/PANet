@@ -1,6 +1,7 @@
 import torch
 import torch.cuda.comm as comm
 from torch.autograd import Function
+import time
 
 
 class Broadcast(Function):
@@ -71,7 +72,9 @@ class Scatter(Function):
         if ctx.input_device == -1:
             # Perform CPU to GPU copies in a background stream
             streams = [_get_stream(device) for device in ctx.target_gpus]
+        s = time.perf_counter()
         outputs = comm.scatter(input, ctx.target_gpus, ctx.chunk_sizes, ctx.dim, streams)
+        print("scatter done in ms:", 1000*(time.perf_counter() - s), " input input_device target_gpus dim chunk_sizes streams", input.size(), ctx.input_device, ctx.target_gpus, dim, chunk_sizes, streams)
         # Synchronize with the copy stream
         if streams is not None:
             for i, output in enumerate(outputs):
