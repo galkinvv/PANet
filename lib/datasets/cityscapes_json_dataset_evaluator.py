@@ -63,6 +63,10 @@ def evaluate_masks(
     import cityscapesscripts.evaluation.evalInstanceLevelSemanticLabeling \
         as cityscapes_eval
 
+    cityscapes_eval.args.gtInstancesFile = os.path.abspath(os.path.join(
+        DATASETS[json_dataset.name][RAW_DIR], "../cityscapesscripts-evaluation-cached-gtInstances.json"
+        ))
+
     roidb = json_dataset.get_roidb()
     for i, entry in enumerate(roidb):
         im_name = entry['image']
