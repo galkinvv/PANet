@@ -70,7 +70,7 @@ class mask_rcnn_outputs(nn.Module):
         if cfg.MRCNN.UPSAMPLE_RATIO > 1:
             x = self.upsample(x)
         if not self.training:
-            x = F.sigmoid(x)
+            x = torch.sigmoid(x)
         return x
 # def mask_rcnn_losses(mask_pred, rois_mask, rois_label, weight):
 #     n_rois, n_classes, _, _ = mask_pred.size()
@@ -98,7 +98,7 @@ def mask_rcnn_losses(masks_pred, masks_int32):
     masks_gt = Variable(torch.from_numpy(masks_int32.astype('float32'))).cuda(device_id)
     weight = (masks_gt > -1).float()  # masks_int32 {1, 0, -1}, -1 means ignore
     loss = F.binary_cross_entropy_with_logits(
-        masks_pred.view(n_rois, -1), masks_gt, weight, size_average=False)
+        masks_pred.view(n_rois, -1), masks_gt, weight, reduction='sum')
     loss /= weight.sum()
     return loss * cfg.MRCNN.WEIGHT_LOSS_MASK
 

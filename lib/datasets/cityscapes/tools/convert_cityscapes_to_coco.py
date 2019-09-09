@@ -92,9 +92,9 @@ def convert_cityscapes_instance_only(
         # 'gtCoarse_train_extra'
     ]
     ann_dirs = [
-        'raw/gtFine_trainvaltest/gtFine/val',
-        # 'gtFine_trainvaltest/gtFine/train',
-        #'raw/gtFine_trainvaltest/gtFine/test',
+        'raw/gtFine/val',
+        # 'raw/gtFine/train',
+        # 'raw/gtFine/test',
 
         # 'gtCoarse/train',
         # 'gtCoarse/train_extra',
@@ -126,7 +126,7 @@ def convert_cityscapes_instance_only(
         'motorcycle',
         'bicycle',
     ]
-    # /home/orwell/Programming/AMD/data/cityscapes/raw/gtFine_trainvaltest/gtFine/test/
+
     for data_set, ann_dir in zip(sets, ann_dirs):
         print('Starting %s' % data_set)
         ann_dict = {}
