@@ -23,6 +23,7 @@ from __future__ import unicode_literals
 import cv2
 import logging
 import os
+import sys
 import uuid
 
 import pycocotools.mask as mask_util
@@ -96,5 +97,8 @@ def evaluate_masks(
                     # save mask
                     cv2.imwrite(os.path.join(output_dir, pngname), mask * 255)
     logger.info('Evaluating...')
+    argv_old = sys.argv
+    sys.argv = ["force_only_unused_arg_0_workaround_for_cityscapes_eval"]
     cityscapes_eval.main()
+    sys.argv = argv_old
     return None
