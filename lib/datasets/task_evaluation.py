@@ -338,19 +338,7 @@ def _empty_box_results():
 
 
 def _empty_mask_results():
-    return OrderedDict({
-        'mask':
-        OrderedDict(
-            [
-                ('AP', -1),
-                ('AP50', -1),
-                ('AP75', -1),
-                ('APs', -1),
-                ('APm', -1),
-                ('APl', -1),
-            ]
-        )
-    })
+    return OrderedDict()
 
 
 def _empty_keypoint_results():

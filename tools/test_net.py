@@ -105,8 +105,10 @@ if __name__ == '__main__':
         assert cfg.TEST.DATASETS, 'cfg.TEST.DATASETS shouldn\'t be empty'
     assert_and_infer_cfg()
 
-    logger.info('Testing with config:')
-    logger.info(pprint.pformat(cfg))
+    with open(os.path.join(args.output_dir, "config_and_args.txt"), "w") as f:
+        f.write(pprint.pformat(cfg))
+        f.write("\n")
+        f.write(pprint.pformat(args))
 
     # For test_engine.multi_gpu_test_net_on_dataset
     args.test_net_file, _ = os.path.splitext(__file__)
