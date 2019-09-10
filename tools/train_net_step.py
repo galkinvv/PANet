@@ -178,9 +178,10 @@ def main():
     original_ims_per_batch = cfg.TRAIN.IMS_PER_BATCH
     original_num_gpus = cfg.NUM_GPUS
     if args.batch_size is None:
-        assert (original_batch_size % args.iter_size) == 0, \
-            'original_batch_size: %d, args.iter_size: %d' % (original_batch_size, args.iter_size)
-        args.batch_size = original_batch_size // args.iter_size
+        args.batch_size = original_batch_size
+    assert (args.batch_size % args.iter_size) == 0, \
+        'args.batch_size: %d, args.iter_size: %d' % (args.batch_size, args.iter_size)
+    args.batch_size = args.batch_size // args.iter_size
     cfg.NUM_GPUS = torch.cuda.device_count()
     assert (args.batch_size % cfg.NUM_GPUS) == 0, \
         'batch_size: %d, NUM_GPUS: %d' % (args.batch_size, cfg.NUM_GPUS)
@@ -192,15 +193,6 @@ def main():
     print('    effective_batch_size: %d --> %d' % (original_batch_size, effective_batch_size))
     print('    NUM_GPUS:             %d --> %d' % (original_num_gpus, cfg.NUM_GPUS))
     print('    IMS_PER_BATCH:        %d --> %d' % (original_ims_per_batch, cfg.TRAIN.IMS_PER_BATCH))
-
-    ### Adjust learning based on batch size change linearly
-    # For iter_size > 1, gradients are `accumulated`, so lr is scaled based
-    # on batch_size instead of effective_batch_size
-    old_base_lr = cfg.SOLVER.BASE_LR
-    cfg.SOLVER.BASE_LR *= args.batch_size / original_batch_size
-    if old_base_lr != cfg.SOLVER.BASE_LR:
-        print('Adjust BASE_LR linearly according to batch_size change:\n'
-          '    BASE_LR: {} --> {}'.format(old_base_lr, cfg.SOLVER.BASE_LR))
 
     # Scale FPN rpn_proposals collect size (post_nms_topN) in `collect` function
     # of `collect_and_distribute_fpn_rpn_proposals.py`
