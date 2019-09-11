@@ -21,8 +21,10 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import cv2
+import glob
 import logging
 import os
+import sys
 import uuid
 
 import pycocotools.mask as mask_util
@@ -63,6 +65,13 @@ def evaluate_masks(
     import cityscapesscripts.evaluation.evalInstanceLevelSemanticLabeling \
         as cityscapes_eval
 
+    if not glob.glob(cityscapes_eval.args.groundTruthSearch):
+        logger.warning("Skipping maks test since groundtruths not found by pattern " + cityscapes_eval.args.groundTruthSearch)
+        return None
+    cityscapes_eval.args.gtInstancesFile = os.path.abspath(os.path.join(
+        DATASETS[json_dataset.name][RAW_DIR], "../cityscapesscripts-evaluation-cached-gtInstances.json"
+        ))
+
     roidb = json_dataset.get_roidb()
     for i, entry in enumerate(roidb):
         im_name = entry['image']
@@ -92,5 +101,8 @@ def evaluate_masks(
                     # save mask
                     cv2.imwrite(os.path.join(output_dir, pngname), mask * 255)
     logger.info('Evaluating...')
+    argv_old = sys.argv
+    sys.argv = ["force_only_unused_arg_0_workaround_for_cityscapes_eval"]
     cityscapes_eval.main()
+    sys.argv = argv_old
     return None
