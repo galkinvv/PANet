@@ -101,7 +101,7 @@ def keypoint_losses(kps_pred, keypoint_locations_int32, keypoint_weights,
     # location); This is softmax applied over a set of spatial locations (i.e.,
     # each spatial location is a "class").
     loss = F.cross_entropy(
-        kps_pred.view(-1, cfg.KRCNN.HEATMAP_SIZE**2), kps_target, reduce=False)
+        kps_pred.view(-1, cfg.KRCNN.HEATMAP_SIZE**2), kps_target, reduction='none')
     loss = torch.sum(loss * keypoint_weights) / torch.sum(keypoint_weights)
     loss *= cfg.KRCNN.LOSS_WEIGHT
 
