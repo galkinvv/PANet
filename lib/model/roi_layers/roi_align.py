@@ -6,8 +6,9 @@ from torch.autograd.function import once_differentiable
 from torch.nn.modules.utils import _pair
 
 from model import _C
+from time import perf_counter
 
-
+back_stat = [0, 0.0, 0.0]
 class _ROIAlign(Function):
     @staticmethod
     def forward(ctx, input, roi, output_size, spatial_scale, sampling_ratio):
@@ -29,6 +30,7 @@ class _ROIAlign(Function):
         spatial_scale = ctx.spatial_scale
         sampling_ratio = ctx.sampling_ratio
         bs, ch, h, w = ctx.input_shape
+        align_start = perf_counter()
         grad_input = _C.roi_align_backward(
             grad_output,
             rois,
@@ -41,6 +43,14 @@ class _ROIAlign(Function):
             w,
             sampling_ratio,
         )
+        global back_stat
+        duration = perf_counter() - align_start
+        back_stat[0] += 1
+        back_stat[1] += duration
+        back_stat[2] = max(back_stat[2], duration)
+        if (back_stat[0] >= 100):
+            print("back_stat avg", back_stat[1]/back_stat[0], "max", back_stat[2])
+            back_stat = [0, 0.0, 0.0]
         return grad_input, None, None, None, None
 
 
